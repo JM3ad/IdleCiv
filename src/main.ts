@@ -1,9 +1,9 @@
 import {helper} from './helper';
+import {Game} from './game';
+import * as ko from "knockout";
 import * as $ from 'jquery';
 
-let message : string = "Hello wod";
-console.log(message);
-
-let integ :number = 4;
-integ = new helper().demo(integ);
-console.log(integ);
+$(document).ready( function(){
+    const game = new Game();
+    ko.applyBindings(game);
+});

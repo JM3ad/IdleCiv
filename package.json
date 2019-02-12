@@ -5,19 +5,23 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "tsc && browserify .\\build\\main.js -o .\\build\\bundle.js"
   },
   "author": "Jack Mead",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^24.0.0",
     "@types/jquery": "^3.3.29",
+    "@types/node": "^10.12.24",
     "jest": "^24.1.0",
     "jquery": "^3.3.1",
+    "knockout": "^3.4.2",
     "ts-jest": "^23.10.5",
     "typescript": "^3.3.3"
   },
   "dependencies": {
+    "@types/knockout": "^3.4.63",
     "npm": "^6.7.0"
   }
 }
