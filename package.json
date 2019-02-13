@@ -11,9 +11,11 @@
   "author": "Jack Mead",
   "license": "ISC",
   "devDependencies": {
+    "@types/fabric": "^1.5.53",
     "@types/jest": "^24.0.0",
     "@types/jquery": "^3.3.29",
     "@types/node": "^10.12.24",
+    "fabricjs": "^1.0.0",
     "jest": "^24.1.0",
     "jquery": "^3.3.1",
     "knockout": "^3.4.2",
