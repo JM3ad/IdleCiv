@@ -1,4 +1,5 @@
 import * as ko from 'knockout';
+import {ProducerImage} from './display/producerImage';
 
 export class Producer {
     name: KnockoutObservable<string>;
@@ -7,6 +8,8 @@ export class Producer {
     foodCost: KnockoutObservable<number>;
     woodCost: KnockoutObservable<number>;
     quantity: KnockoutObservable<number>;
+    image: KnockoutObservable<ProducerImage>;
+
     purchase: () => void;
 
     constructor(name: string, foodIncome: number, woodIncome: number, foodCost: number, woodCost: number) {
@@ -16,6 +19,8 @@ export class Producer {
         this.foodCost = ko.observable(foodCost);
         this.woodCost = ko.observable(woodCost);
         this.quantity = ko.observable(0);
+        this.image = ko.observable(new ProducerImage());
+        
         this.purchase = function(){
             const currentFoodCost = this.foodCost();
             if (currentFoodCost > 0){

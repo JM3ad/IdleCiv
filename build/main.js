@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var helper_1 = require("./helper");
-var message = "Hello wod";
-console.log(message);
-var integ = 4;
-integ = new helper_1.helper().demo(integ);
-console.log(integ);
+const game_1 = require("./game");
+const ko = require("knockout");
+const $ = require("jquery");
+$(document).ready(function () {
+    const game = new game_1.Game();
+    ko.applyBindings(game);
+    game.start();
+});
