@@ -3,7 +3,7 @@ import * as fabric from 'fabric';
 import {Producer} from '../producer';
 
 export class Painter{
-    paint: (producers: Producer[]) => void;
+    /*paint: (producers: Producer[]) => void;
     canvas: fabric.fabric.Canvas;
     
     constructor(){
@@ -28,7 +28,8 @@ export class Painter{
             
             this.canvas.renderAll();
         }
+        
     }
 
-
+*/
 }

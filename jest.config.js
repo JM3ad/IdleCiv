@@ -8,6 +8,7 @@ module.exports = {
         tsConfig: "tsconfig.json"
       }
     },
+    modulePaths: ["<rootDir>/src/"],
     testMatch: ["**/__tests__/**/*.+(ts|tsx|js)"],
     testPathIgnorePatterns: ["/node_modules/", "/dist/", "/lib/"],
     verbose: true,

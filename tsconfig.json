@@ -6,7 +6,12 @@
       "strict": true,
       "alwaysStrict": true,
       "rootDir": "src",
-      "outDir": "build"
+      "outDir": "build",
+      "baseUrl": "src",
+      "paths": {
+        "producer": ["producer"],
+        "helpers/*": ["helpers/*"]
+      }
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules","**/*.d.ts"]

@@ -1,8 +1,8 @@
-import {Producer} from './producer';
+import {Producer} from 'producer';
 import * as ko from 'knockout';
-import {IncomeCalculator} from './helpers/incomeCalculator';
-import {ProducerHelper} from './helpers/producerHelper';
-import { Painter } from './display/painter';
+import {IncomeCalculator} from 'helpers/incomeCalculator';
+import {ProducerHelper} from 'helpers/producerHelper';
+import { Painter } from 'display/painter';
 
 export class Game {
     producers: KnockoutObservableArray<Producer>;
@@ -37,11 +37,11 @@ export class Game {
             if (this.food() >= producer.foodCost() && this.wood() >= producer.woodCost()){
                 this.food(this.food() - producer.foodCost());
                 this.wood(this.wood() - producer.woodCost());
-                producer.purchase();                
+                producer.purchase();
             }
         };
         this.draw = () => {
-            this.painter().paint(this.producers());
+            //this.painter().paint(this.producers());
         };
         this.start = () => {
             setInterval(this.addIncome, 1000);

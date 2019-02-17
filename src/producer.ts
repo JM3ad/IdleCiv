@@ -1,5 +1,5 @@
 import * as ko from 'knockout';
-import {ProducerImage} from './display/producerImage';
+import {ProducerImage} from 'display/producerImage';
 
 export class Producer {
     name: KnockoutObservable<string>;
