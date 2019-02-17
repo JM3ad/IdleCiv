@@ -35,16 +35,57 @@ describe('Resource collection should:', () => {
 })
 
 describe('Purchasing producers should:', () => {
-    test('fail if too few resources', () => {
-        expect(0).toBe(1);
+    let producer : Producer;
+    let game : Game;
+    const foodCost = 5;
+    const woodCost = 3;
+
+    beforeEach(() => {
+        producer = new Producer('name', 0, 0, foodCost, woodCost);
+        producer.purchase = jest.fn(() => {});
+        game = setUpGame([producer]);
     })
+
+    test('fail if too little food', () => {
+        game.food(foodCost - 1);
+        game.wood(woodCost);
+        game.purchase(producer);
+        expect(producer.purchase).not.toHaveBeenCalled();
+    })
+
+    test('fail if too little wood', () => {
+        game.food(foodCost + 4);
+        game.wood(woodCost - 1);
+        game.purchase(producer);
+        expect(producer.purchase).not.toHaveBeenCalled();
+    })
+
+    test('have unchanged resources if failed', () => {
+        const startingFood = foodCost - 1;
+        const startingWood = woodCost - 1;
+        game.food(startingFood);
+        game.wood(startingWood);
+        game.purchase(producer);
+        expect(producer.purchase).not.toHaveBeenCalled();
+        expect(game.food()).toBe(startingFood);
+        expect(game.wood()).toBe(startingWood);
+    })
+
     test('succeed if resources sufficient', () => {
-        expect(0).toBe(1);
+        game.food(foodCost);
+        game.wood(woodCost);
+        game.purchase(producer);
+        expect(producer.purchase).toHaveBeenCalled();
     })
+
     test('consume resources iff successful', () => {
-        expect(0).toBe(1);
-    })
-    test('increase the producer quantity', () => {
-        expect(0).toBe(1);
+        const startingFood = foodCost + 1;
+        const startingWood = woodCost + 3;
+        game.food(startingFood);
+        game.wood(startingWood);
+        game.purchase(producer);
+        expect(producer.purchase).toHaveBeenCalled();
+        expect(game.food()).toBe(startingFood - foodCost);
+        expect(game.wood()).toBe(startingWood - woodCost);
     })
 })
