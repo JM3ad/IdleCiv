@@ -1,36 +1,36 @@
 import * as ko from 'knockout';
 import {ProducerImage} from 'display/producerImage';
+import {ResourceList} from 'resources';
 
 export class Producer {
     name: KnockoutObservable<string>;
-    foodIncome: KnockoutObservable<number>;
-    woodIncome: KnockoutObservable<number>;
-    foodCost: KnockoutObservable<number>;
-    woodCost: KnockoutObservable<number>;
+    income: KnockoutObservable<ResourceList>;
+    cost: KnockoutObservable<ResourceList>;
     quantity: KnockoutObservable<number>;
     image: KnockoutObservable<ProducerImage>;
+    isUnlocked: KnockoutObservable<boolean>;
 
     purchase: () => void;
+    unlockIfSuitable: (resources: ResourceList) => void;
 
-    constructor(name: string, foodIncome: number, woodIncome: number, foodCost: number, woodCost: number) {
+    constructor(name: string, income: ResourceList, cost: ResourceList, unlockCost?: ResourceList) {
         this.name = ko.observable(name);
-        this.foodIncome = ko.observable(foodIncome);
-        this.woodIncome = ko.observable(woodIncome);
-        this.foodCost = ko.observable(foodCost);
-        this.woodCost = ko.observable(woodCost);
+        this.income = ko.observable(income);
+        this.cost = ko.observable(cost);
         this.quantity = ko.observable(0);
         this.image = ko.observable(new ProducerImage());
+        this.isUnlocked = ko.observable(false);
         
-        this.purchase = function(){
-            const currentFoodCost = this.foodCost();
-            if (currentFoodCost > 0){
-                this.foodCost(Math.round(currentFoodCost * 1.4) + 1);
-            }
-            const currentWoodCost = this.woodCost();
-            if (currentWoodCost > 0){
-                this.woodCost(Math.round(currentWoodCost * 1.4) + 1);
-            }
+        this.purchase = function() {
+            this.cost().multiplyAndRoundUp(1.4);
             this.quantity(this.quantity() + 1);
+        }
+
+        this.unlockIfSuitable = function(resources: ResourceList) {
+            if (this.isUnlocked()){
+                return;
+            }
+            this.isUnlocked(resources.canAfford(unlockCost || new ResourceList()));
         }
     }
 }

@@ -1,8 +1,9 @@
 import {Producer} from 'producer';
+import {ResourceList, Resources} from 'resources';
 
-function setUpProducer(foodCost?: number, woodCost?: number, foodIncome?: number, woodIncome?: number){
+function setUpProducer(initialCost?: ResourceList, income?: ResourceList, unlockCost?: ResourceList){
     const name = "Name";
-    return new Producer(name, foodIncome || 1, woodIncome || 1, foodCost || 1, woodCost || 1);
+    return new Producer(name, income || new ResourceList(), initialCost || new ResourceList(), unlockCost || new ResourceList());
 }
 
 describe('Producers should:', ()=>{
@@ -20,9 +21,43 @@ describe('Producers should:', ()=>{
     test('Producer cost increases on purchase', ()=>{
         const initialFoodCost = 3;
         const initialWoodCost = 4;
-        const producer = setUpProducer(initialFoodCost, initialWoodCost);
+        const initialCost = new ResourceList()
+            .with(Resources.Food, initialFoodCost)
+            .with(Resources.Wood, initialWoodCost);
+        const producer = setUpProducer(initialCost);
         producer.purchase();
-        expect(producer.foodCost()).toBeGreaterThan(initialFoodCost);
-        expect(producer.woodCost()).toBeGreaterThan(initialWoodCost);
+        expect(producer.cost().get(Resources.Food)).toBeGreaterThan(initialFoodCost);
+        expect(producer.cost().get(Resources.Wood)).toBeGreaterThan(initialWoodCost);
+    })
+
+    test('is locked initially', ()=>{
+        const empty = new ResourceList();
+        const producer = setUpProducer(empty, empty, empty);
+        
+        expect(producer.isUnlocked()).toBeFalsy();
+    })
+
+    test('is unlocked if no unlock cost provided', ()=>{
+        const empty = new ResourceList();
+        const producer = setUpProducer(undefined, undefined, empty);
+        producer.unlockIfSuitable(empty);
+
+        expect(producer.isUnlocked()).toBeTruthy();
+    })
+
+    test('is unlocked when correct cost provided', ()=>{
+        const foodUnlockCost = new ResourceList()
+            .with(Resources.Food, 10);
+        const producer = setUpProducer(undefined, undefined, foodUnlockCost);
+        producer.unlockIfSuitable(new ResourceList());
+        expect(producer.isUnlocked()).toBeFalsy();
+
+        const insufficientFood = new ResourceList()
+            .with(Resources.Food, 5);
+        producer.unlockIfSuitable(insufficientFood);
+        expect(producer.isUnlocked()).toBeFalsy();
+
+        producer.unlockIfSuitable(foodUnlockCost);        
+        expect(producer.isUnlocked()).toBeTruthy();
     })
 })

@@ -1,20 +1,22 @@
 import * as ko from 'knockout';
 import {Producer} from '../producer';
+import {ResourceList} from 'resources';
 
 export class IncomeCalculator {
-    calculateFoodIncome: (producers : Producer[]) => number;
-    calculateWoodIncome: (producers : Producer[]) => number;    
+    calculateIncome: (producers : Producer[]) => ResourceList;
 
     constructor() {
-        this.calculateFoodIncome = function(producers: Producer[]){
-            return ko.unwrap(producers).reduce(function(result : number, v : Producer, i : number) {
-                return result + v.foodIncome() * v.quantity();
-            }, 0);
-        }
-        this.calculateWoodIncome = function(producers: Producer[]){
-            return ko.unwrap(producers).reduce(function(result : number, v : Producer, i : number) {
-                return result + v.woodIncome() * v.quantity();
-            }, 0);
+        this.calculateIncome = function(producers: Producer[]){
+            return producers
+                .map(producer => {
+                    var copy = producer.income().copy();
+                    copy.multiply(producer.quantity());
+                    return copy;
+                })
+                .reduce(function(result : ResourceList, currentValue : ResourceList, i : number) {
+                    result.addList(currentValue);
+                    return result;
+                }, new ResourceList());
         }
     }
 }
