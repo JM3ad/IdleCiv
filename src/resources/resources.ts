@@ -83,6 +83,7 @@ export class ResourceList{
 
         this.with = (resource: Resources, quantity: number) => {
             this.resources()[resource] = quantity;
+            if(this.resources.valueHasMutated) {this.resources.valueHasMutated();}
             return this;
         }
         

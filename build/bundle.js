@@ -120,11 +120,20 @@ class UpgradeGenerator {
 UpgradeGenerator.generateChopUpgrades = () => {
     return [
         new upgrade_1.Upgrade("Axes", "New tools", new resources_1.ResourceList().with(resources_1.Resources.Wood, 10))
+            .with((income) => {
+            const copy = income.copy();
+            copy.add(resources_1.Resources.Wood, 3);
+            return copy;
+        })
     ];
 };
 UpgradeGenerator.generateFarmUpgrades = () => {
     return [
-        new upgrade_1.Upgrade("Scythes", "These new tools will double your farming rate", new resources_1.ResourceList().with(resources_1.Resources.Wood, 5)),
+        new upgrade_1.Upgrade("Scythes", "These new tools will double your farming rate", new resources_1.ResourceList().with(resources_1.Resources.Wood, 5)).with((income) => {
+            const copy = income.copy();
+            copy.add(resources_1.Resources.Food, 5);
+            return copy;
+        })
     ];
 };
 exports.UpgradeGenerator = UpgradeGenerator;
@@ -159,8 +168,8 @@ const ko = require("knockout");
 const $ = require("jquery");
 $(document).ready(function () {
     const game = new game_1.Game();
-    ko.applyBindings(game);
     game.start();
+    ko.applyBindings(game);
 });
 
 },{"./game":3,"jquery":11,"knockout":12}],8:[function(require,module,exports){
@@ -285,6 +294,9 @@ class ResourceList {
         });
         this.with = (resource, quantity) => {
             this.resources()[resource] = quantity;
+            if (this.resources.valueHasMutated) {
+                this.resources.valueHasMutated();
+            }
             return this;
         };
         this.copy = () => {

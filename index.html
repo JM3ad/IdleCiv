@@ -16,7 +16,9 @@
                         <div class="upgrade-title-container">
                             <div class="upgrade-title" data-bind="text: name"></div>
                             <div class="cost-container">
-                                Cost here
+                                <div class="resources" data-bind="foreach: cost().getAll()">
+                                    <span data-bind="text: name"></span><strong data-bind="text: value"></strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -26,7 +28,9 @@
                         <div class="upgrade-title-container">
                             <div class="upgrade-title" data-bind="text: name"></div>
                             <div class="cost-container">
-                                Cost here
+                                <div class="resources" data-bind="foreach: cost().getAll()">
+                                    <span data-bind="text: name"></span><strong data-bind="text: value"></strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -37,7 +41,9 @@
                             <div class="upgrade-title-container">
                                 <div class="upgrade-title" data-bind="text: name"></div>
                                 <div class="cost-container">
-                                    Cost here
+                                    <div class="resources" data-bind="foreach: cost().getAll()">
+                                        <span data-bind="text: name"></span><strong data-bind="text: value"></strong>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -62,7 +68,9 @@
                 <div class="producer-title-container">
                     <div class="producer-title" data-bind="text: name"></div>
                     <div class="producer-cost-container">
-                        This will need updating to resources.
+                        <div class="resources" data-bind="foreach: cost().getAll()">
+                            <span data-bind="text: name"></span><strong data-bind="text: value"></strong>
+                        </div>
                     </div>
                 </div>
                 <div class="producer-quantity" data-bind="text: quantity"></div>
