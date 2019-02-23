@@ -1,5 +1,5 @@
-import {Producer} from 'producer';
-import {ResourceList, Resources} from 'resources';
+import {Producer} from 'purchasable/producer';
+import {ResourceList, Resources} from 'resources/resources';
 
 function setUpProducer(initialCost?: ResourceList, income?: ResourceList, unlockCost?: ResourceList){
     const name = "Name";

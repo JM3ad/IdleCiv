@@ -1,7 +1,7 @@
-import {Producer} from 'producer';
+import {Producer} from 'purchasable/producer';
 import {IncomeCalculator} from 'helpers/incomeCalculator';
-import {ProducerHelper} from 'helpers/producerHelper';
-import {ResourceList, Resources} from 'resources';
+import {ProducerGenerator} from 'generators/producerGenerator';
+import {ResourceList, Resources} from 'resources/resources';
 
 describe('Income calculator should:',()=>{
     test('see no income for no producers', ()=>{
@@ -15,7 +15,7 @@ describe('Income calculator should:',()=>{
 
     test('see no income for producers with 0 quantity', () => {
         const calculator = new IncomeCalculator();
-        const producers = new ProducerHelper().generateProducers();
+        const producers = ProducerGenerator.generateProducers();
 
         expect(calculator.calculateIncome(producers).get(Resources.Food)).toBe(0);
         expect(calculator.calculateIncome(producers).get(Resources.Wood)).toBe(0);

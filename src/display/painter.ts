@@ -1,6 +1,6 @@
 import * as ko from 'knockout';
 import * as fabric from 'fabric';
-import {Producer} from '../producer';
+import {Producer} from '../purchasable/producer';
 
 export class Painter{
     /*paint: (producers: Producer[]) => void;

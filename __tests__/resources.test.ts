@@ -1,4 +1,4 @@
-import {ResourceList, Resources} from 'resources';
+import {ResourceList, Resources} from 'resources/resources';
 
 
 describe('Resources should:', ()=>{

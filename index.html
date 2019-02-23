@@ -1,41 +1,81 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script src="./build/bundle.js"></script>
-        <link rel="stylesheet" href="./main.css"></style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="left-sidebar">
-                <div class="upgrades-container">
-                    Upgrades
-                </div>
-            </div>
-            <div class="main-content">
-                <div class="resource-display">
-                    <div class="pull-left"><p>Food: <strong data-bind="text: food"></strong></p></div>
-                    <div class="pull-right"><p>Wood: <strong data-bind="text: wood"></strong></p></div>
-                </div>
-                <canvas class="main-display" id="canvas">
 
-                </canvas>
-                <div class="buttons">
-                    <button data-bind="click: chopWood">Chop Wood</button>
-                    <button data-bind="click: growFood">Grow Food</button>
-                </div>
-            </div>
-            <div class="right-sidebar" data-bind="foreach: producers">
-                <div class="producer-container" data-bind="click: $parent.purchase">
-                    <div class="producer-title-container">
-                        <div class="producer-title" data-bind="text: name"></div>
-                        <div class="producer-cost-container">
-                                <div data-bind="text: foodCost"></div>🍕
-                                <div data-bind="text: woodCost"></div>🌳
+<head>
+    <script src="./build/bundle.js"></script>
+    <link rel="stylesheet" href="./main.css">
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left-sidebar">
+            <div class="upgrades-container">
+                <div class="chop-upgrades" data-bind="foreach: chopUpgrades">
+                    <div class="upgrade-container" data-bind="click: $parent.purchaseWoodUpgrade">
+                        <div class="upgrade-title-container">
+                            <div class="upgrade-title" data-bind="text: name"></div>
+                            <div class="cost-container">
+                                Cost here
+                            </div>
                         </div>
                     </div>
-                    <div class="producer-quantity" data-bind="text: quantity"></div>
+                </div>
+                <div class="farm-upgrades" data-bind="foreach: farmUpgrades">
+                    <div class="upgrade-container" data-bind="click: $parent.purchaseFoodUpgrade">
+                        <div class="upgrade-title-container">
+                            <div class="upgrade-title" data-bind="text: name"></div>
+                            <div class="cost-container">
+                                Cost here
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="producer-upgrades" data-bind="foreach: producers">
+                    <div class="upgrade" data-bind="foreach: upgrades">
+                        <div class="upgrade-container" data-bind="click: $parents[1].purchaseProducerUpgrade">
+                            <div class="upgrade-title-container">
+                                <div class="upgrade-title" data-bind="text: name"></div>
+                                <div class="cost-container">
+                                    Cost here
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </body>
+        <div class="main-content">
+            <div class="resource-display">
+                <div class="pull-left">
+                    <p>Food: <strong data-bind="text: food"></strong></p>
+                </div>
+                <div class="pull-right">
+                    <p>Wood: <strong data-bind="text: wood"></strong></p>
+                </div>
+            </div>
+            <canvas class="main-display" id="canvas">
+
+            </canvas>
+            <div class="buttons">
+                <button data-bind="click: chopWood">Chop Wood</button>
+                <button data-bind="click: growFood">Grow Food</button>
+            </div>
+        </div>
+        <div class="right-sidebar" data-bind="foreach: producers">
+            <div class="producer-container" data-bind="click: $parent.purchaseProducer">
+                <div class="producer-title-container">
+                    <div class="producer-title" data-bind="text: name"></div>
+                    <div class="producer-cost-container">
+                        This will need updating to resources.
+                        <div data-bind="text: foodCost"></div>🍕
+                        <div data-bind="text: woodCost"></div>🌳
+                    </div>
+                </div>
+                <div class="producer-quantity" data-bind="text: quantity"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
 </html>

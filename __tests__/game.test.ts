@@ -1,6 +1,6 @@
-import {Producer} from 'producer';
+import {Producer} from 'purchasable/producer';
 import {Game} from 'game';
-import {Resources, ResourceList} from 'resources';
+import {Resources, ResourceList} from 'resources/resources';
 
 function setUpGame(producers: Producer[]){
     const game = new Game();
@@ -52,7 +52,7 @@ describe('Purchasing producers should:', () => {
         game.resources()
             .with(Resources.Food, foodCost - 1)
             .with(Resources.Wood, woodCost);
-        game.purchase(producer);
+        game.purchaseProducer(producer);
         expect(producer.purchase).not.toHaveBeenCalled();
     })
 
@@ -60,7 +60,7 @@ describe('Purchasing producers should:', () => {
         game.resources()
             .with(Resources.Food, foodCost + 4)
             .with(Resources.Wood, woodCost - 2);
-        game.purchase(producer);
+        game.purchaseProducer(producer);
         expect(producer.purchase).not.toHaveBeenCalled();
     })
 
@@ -70,7 +70,7 @@ describe('Purchasing producers should:', () => {
         game.resources()
             .with(Resources.Food, startingFood)
             .with(Resources.Wood, startingWood);
-        game.purchase(producer);
+        game.purchaseProducer(producer);
         expect(producer.purchase).not.toHaveBeenCalled();
         expect(game.resources().get(Resources.Food)).toBe(startingFood);
         expect(game.resources().get(Resources.Wood)).toBe(startingWood);
@@ -80,7 +80,7 @@ describe('Purchasing producers should:', () => {
         game.resources()
             .with(Resources.Food, foodCost)
             .with(Resources.Wood, woodCost);
-        game.purchase(producer);
+        game.purchaseProducer(producer);
         expect(producer.purchase).toHaveBeenCalled();
     })
 
@@ -90,7 +90,7 @@ describe('Purchasing producers should:', () => {
         game.resources()
             .with(Resources.Food, startingFood)
             .with(Resources.Wood, startingWood);
-        game.purchase(producer);
+        game.purchaseProducer(producer);
         expect(producer.purchase).toHaveBeenCalled();
         expect(game.resources().get(Resources.Food)).toBe(startingFood - foodCost);
         expect(game.resources().get(Resources.Wood)).toBe(startingWood - woodCost);
