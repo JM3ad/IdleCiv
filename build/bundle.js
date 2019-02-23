@@ -20,36 +20,58 @@ class ProducerImage {
 }
 exports.ProducerImage = ProducerImage;
 
-},{"knockout":9}],3:[function(require,module,exports){
+},{"knockout":12}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const ko = require("knockout");
 const incomeCalculator_1 = require("./helpers/incomeCalculator");
-const producerHelper_1 = require("./helpers/producerHelper");
+const producerGenerator_1 = require("./generators/producerGenerator");
 const painter_1 = require("./display/painter");
+const resources_1 = require("./resources/resources");
+const upgradeGenerator_1 = require("./generators/upgradeGenerator");
 class Game {
     constructor() {
-        this.food = ko.observable(0);
-        this.wood = ko.observable(0);
-        const helper = new producerHelper_1.ProducerHelper();
-        this.producers = ko.observableArray(helper.generateProducers());
+        this.producers = ko.observableArray(producerGenerator_1.ProducerGenerator.generateProducers());
+        this.chopIncome = ko.observable(new resources_1.ResourceList()
+            .with(resources_1.Resources.Wood, 1));
+        this.farmIncome = ko.observable(new resources_1.ResourceList()
+            .with(resources_1.Resources.Food, 1));
+        this.chopUpgrades = ko.observableArray(upgradeGenerator_1.UpgradeGenerator.generateChopUpgrades());
+        this.farmUpgrades = ko.observableArray(upgradeGenerator_1.UpgradeGenerator.generateFarmUpgrades());
         this.painter = ko.observable(new painter_1.Painter());
+        this.resources = ko.observable(new resources_1.ResourceList());
         this.addIncome = () => {
             const calculator = new incomeCalculator_1.IncomeCalculator();
-            this.wood(this.wood() + calculator.calculateWoodIncome(ko.unwrap(this.producers)));
-            this.food(this.food() + calculator.calculateFoodIncome(ko.unwrap(this.producers)));
+            this.resources().addList(calculator.calculateIncome(ko.unwrap(this.producers)));
         };
         this.chopWood = () => {
-            this.wood(this.wood() + 1);
+            this.resources().addList(this.chopIncome());
         };
         this.growFood = () => {
-            this.food(this.food() + 1);
+            this.resources().addList(this.farmIncome());
         };
-        this.purchase = (producer) => {
-            if (this.food() >= producer.foodCost() && this.wood() >= producer.woodCost()) {
-                this.food(this.food() - producer.foodCost());
-                this.wood(this.wood() - producer.woodCost());
+        this.purchaseProducer = (producer) => {
+            if (this.resources().canAfford(producer.cost())) {
+                this.resources().minusCost(producer.cost());
                 producer.purchase();
+            }
+        };
+        this.purchaseFarmUpgrade = (upgrade) => {
+            if (this.resources().canAfford(upgrade.cost())) {
+                this.resources().minusCost(upgrade.cost());
+                upgrade.purchase(this.farmIncome());
+            }
+        };
+        this.purchaseWoodUpgrade = (upgrade) => {
+            if (this.resources().canAfford(upgrade.cost())) {
+                this.resources().minusCost(upgrade.cost());
+                upgrade.purchase(this.chopIncome());
+            }
+        };
+        this.purchaseProducerUpgrade = (producer, upgrade) => {
+            if (this.resources().canAfford(upgrade.cost())) {
+                this.resources().minusCost(upgrade.cost());
+                producer.purchaseUpgrade(upgrade);
             }
         };
         this.draw = () => {
@@ -60,46 +82,69 @@ class Game {
             setInterval(this.draw, 1000);
         };
     }
+    ;
+    ;
+    ;
 }
 exports.Game = Game;
 
-},{"./display/painter":1,"./helpers/incomeCalculator":4,"./helpers/producerHelper":5,"knockout":9}],4:[function(require,module,exports){
+},{"./display/painter":1,"./generators/producerGenerator":4,"./generators/upgradeGenerator":5,"./helpers/incomeCalculator":6,"./resources/resources":10,"knockout":12}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ko = require("knockout");
+const producer_1 = require("../purchasable/producer");
+const resources_1 = require("../resources/resources");
+class ProducerGenerator {
+}
+ProducerGenerator.generateProducers = () => {
+    return [
+        new producer_1.Producer("Farmer", new resources_1.ResourceList().with(resources_1.Resources.Food, 1), new resources_1.ResourceList().with(resources_1.Resources.Food, 1)),
+        new producer_1.Producer("Lumberjack", new resources_1.ResourceList().with(resources_1.Resources.Wood, 1), new resources_1.ResourceList().with(resources_1.Resources.Food, 1))
+    ];
+};
+exports.ProducerGenerator = ProducerGenerator;
+
+},{"../purchasable/producer":8,"../resources/resources":10}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const resources_1 = require("../resources/resources");
+const upgrade_1 = require("../purchasable/upgrade");
+class UpgradeGenerator {
+}
+UpgradeGenerator.generateChopUpgrades = () => {
+    return [
+        new upgrade_1.Upgrade("Axes", "New tools", new resources_1.ResourceList().with(resources_1.Resources.Wood, 10))
+    ];
+};
+UpgradeGenerator.generateFarmUpgrades = () => {
+    return [
+        new upgrade_1.Upgrade("Scythes", "These new tools will double your farming rate", new resources_1.ResourceList().with(resources_1.Resources.Wood, 5)),
+    ];
+};
+exports.UpgradeGenerator = UpgradeGenerator;
+
+},{"../purchasable/upgrade":9,"../resources/resources":10}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const resources_1 = require("../resources/resources");
 class IncomeCalculator {
     constructor() {
-        this.calculateFoodIncome = function (producers) {
-            return ko.unwrap(producers).reduce(function (result, v, i) {
-                return result + v.foodIncome() * v.quantity();
-            }, 0);
-        };
-        this.calculateWoodIncome = function (producers) {
-            return ko.unwrap(producers).reduce(function (result, v, i) {
-                return result + v.woodIncome() * v.quantity();
-            }, 0);
+        this.calculateIncome = function (producers) {
+            return producers
+                .map(producer => {
+                var copy = producer.income().copy();
+                copy.multiply(producer.quantity());
+                return copy;
+            })
+                .reduce(function (result, currentValue, i) {
+                result.addList(currentValue);
+                return result;
+            }, new resources_1.ResourceList());
         };
     }
 }
 exports.IncomeCalculator = IncomeCalculator;
 
-},{"knockout":9}],5:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const producer_1 = require("../producer");
-class ProducerHelper {
-    constructor() {
-        this.generateProducers = function () {
-            return [
-                new producer_1.Producer("Farmer", 1, 0, 1, 0),
-                new producer_1.Producer("Lumberjack", 0, 1, 1, 0)
-            ];
-        };
-    }
-}
-exports.ProducerHelper = ProducerHelper;
-
-},{"../producer":7}],6:[function(require,module,exports){
+},{"../resources/resources":10}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const game_1 = require("./game");
@@ -111,36 +156,128 @@ $(document).ready(function () {
     game.start();
 });
 
-},{"./game":3,"jquery":8,"knockout":9}],7:[function(require,module,exports){
+},{"./game":3,"jquery":11,"knockout":12}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const ko = require("knockout");
-const producerImage_1 = require("./display/producerImage");
+const producerImage_1 = require("../display/producerImage");
+const resources_1 = require("../resources/resources");
 class Producer {
-    constructor(name, foodIncome, woodIncome, foodCost, woodCost) {
+    constructor(name, income, cost, unlockCost, upgrades) {
         this.name = ko.observable(name);
-        this.foodIncome = ko.observable(foodIncome);
-        this.woodIncome = ko.observable(woodIncome);
-        this.foodCost = ko.observable(foodCost);
-        this.woodCost = ko.observable(woodCost);
+        this.income = ko.observable(income);
+        this.cost = ko.observable(cost);
         this.quantity = ko.observable(0);
         this.image = ko.observable(new producerImage_1.ProducerImage());
+        this.isUnlocked = ko.observable(false);
+        this.upgrades = ko.observableArray(upgrades || []);
         this.purchase = function () {
-            const currentFoodCost = this.foodCost();
-            if (currentFoodCost > 0) {
-                this.foodCost(Math.round(currentFoodCost * 1.4) + 1);
-            }
-            const currentWoodCost = this.woodCost();
-            if (currentWoodCost > 0) {
-                this.woodCost(Math.round(currentWoodCost * 1.4) + 1);
-            }
+            this.cost().multiplyAndRoundUp(1.4);
             this.quantity(this.quantity() + 1);
+        };
+        this.purchaseUpgrade = (upgrade) => {
+            upgrade.purchase(this.income());
+        };
+        this.unlockIfSuitable = function (resources) {
+            if (this.isUnlocked()) {
+                return;
+            }
+            this.isUnlocked(resources.canAfford(unlockCost || new resources_1.ResourceList()));
         };
     }
 }
 exports.Producer = Producer;
 
-},{"./display/producerImage":2,"knockout":9}],8:[function(require,module,exports){
+},{"../display/producerImage":2,"../resources/resources":10,"knockout":12}],9:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const ko = require("knockout");
+class Upgrade {
+    constructor(name, description, cost) {
+        this.name = name;
+        this.description = description;
+        this.cost = ko.observable(cost);
+        this.effect = (income) => income;
+        this.purchased = ko.observable(false);
+        this.with = (effect) => {
+            this.effect = effect;
+            return this;
+        };
+        this.purchase = (income) => {
+            if (this.purchased()) {
+                return income;
+            }
+            this.purchased(true);
+            return this.effect(income);
+        };
+    }
+}
+exports.Upgrade = Upgrade;
+
+},{"knockout":12}],10:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Resources;
+(function (Resources) {
+    Resources[Resources["Food"] = 0] = "Food";
+    Resources[Resources["Wood"] = 1] = "Wood";
+})(Resources = exports.Resources || (exports.Resources = {}));
+class ResourceList {
+    constructor() {
+        this.resources = [];
+        for (let resource in Resources) {
+            this.resources[resource] = 0;
+        }
+        this.addList = (resources) => {
+            this.resources = resources.resources.map((num, idx) => {
+                return num + this.resources[idx];
+            });
+        };
+        this.canAfford = (resources) => {
+            return this.resources.map((resource, index) => {
+                return resource >= resources.get(index);
+            }).reduce((previous, current, i) => {
+                return previous && current;
+            });
+        };
+        this.minusCost = (resources) => {
+            this.resources = resources.resources.map((num, idx) => {
+                return this.resources[idx] - num;
+            });
+        };
+        this.add = (resource, quantity) => {
+            this.resources[resource] += quantity;
+        };
+        this.multiply = (multiplier) => {
+            this.resources = this.resources.map((num, idx) => {
+                return num * multiplier;
+            });
+        };
+        this.multiplyAndRoundUp = (multiplier) => {
+            this.resources = this.resources.map((num, idx) => {
+                num = num > 0 ? num + 1 : num;
+                return Math.round(num * multiplier);
+            });
+        };
+        this.get = (resource) => {
+            return this.resources[resource];
+        };
+        this.with = (resource, quantity) => {
+            this.resources[resource] = quantity;
+            return this;
+        };
+        this.copy = () => {
+            const copy = new ResourceList();
+            Object.values(Resources).map((resource, index, arr) => {
+                copy.with(resource, this.get(resource));
+            });
+            return copy;
+        };
+    }
+}
+exports.ResourceList = ResourceList;
+
+},{}],11:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
@@ -10506,7 +10643,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*!
  * Knockout JavaScript library v3.4.2
  * (c) The Knockout.js team - http://knockoutjs.com/
@@ -16442,4 +16579,4 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 }());
 })();
 
-},{}]},{},[6]);
+},{}]},{},[7]);

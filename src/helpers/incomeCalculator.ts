@@ -1,6 +1,6 @@
 import * as ko from 'knockout';
 import {Producer} from '../purchasable/producer';
-import {ResourceList} from 'resources/resources';
+import {ResourceList} from '../resources/resources';
 
 export class IncomeCalculator {
     calculateIncome: (producers : Producer[]) => ResourceList;

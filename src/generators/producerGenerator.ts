@@ -1,6 +1,6 @@
 import {Producer} from '../purchasable/producer';
 import * as ko from 'knockout';
-import {Resources, ResourceList} from 'resources/resources';
+import {Resources, ResourceList} from '../resources/resources';
 
 export class ProducerGenerator{
     static generateProducers: () => Producer[] = () => {

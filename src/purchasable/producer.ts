@@ -1,6 +1,6 @@
 import * as ko from 'knockout';
-import {ProducerImage} from 'display/producerImage';
-import {ResourceList} from 'resources/resources';
+import {ProducerImage} from '../display/producerImage';
+import {ResourceList} from '../resources/resources';
 import { Upgrade } from './upgrade';
 
 export class Producer {

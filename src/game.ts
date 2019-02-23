@@ -1,11 +1,11 @@
-import {Producer} from 'purchasable/producer';
+import {Producer} from './purchasable/producer';
 import * as ko from 'knockout';
-import {IncomeCalculator} from 'helpers/incomeCalculator';
-import {ProducerGenerator} from 'generators/producerGenerator';
-import { Painter } from 'display/painter';
-import { ResourceList, Resources } from 'resources/resources';
-import { Upgrade } from 'purchasable/upgrade';
-import { UpgradeGenerator } from 'generators/upgradeGenerator';
+import {IncomeCalculator} from './helpers/incomeCalculator';
+import {ProducerGenerator} from './generators/producerGenerator';
+import { Painter } from './display/painter';
+import { ResourceList, Resources } from './resources/resources';
+import { Upgrade } from './purchasable/upgrade';
+import { UpgradeGenerator } from './generators/upgradeGenerator';
 
 export class Game {
     producers: KnockoutObservableArray<Producer> = ko.observableArray(ProducerGenerator.generateProducers());;

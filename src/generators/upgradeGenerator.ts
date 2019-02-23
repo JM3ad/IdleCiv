@@ -1,6 +1,6 @@
 import * as ko from 'knockout';
-import {Resources, ResourceList} from 'resources/resources';
-import { Upgrade } from 'purchasable/upgrade';
+import {Resources, ResourceList} from '../resources/resources';
+import { Upgrade } from '../purchasable/upgrade';
 
 export class UpgradeGenerator{
     static generateChopUpgrades: () => Upgrade[] = () => {
