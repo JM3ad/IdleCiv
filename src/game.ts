@@ -21,7 +21,7 @@ export class Game {
     chopWood: () => void;
     growFood: () => void;
     purchaseProducer: (producer: Producer) => void;
-    purchaseFarmUpgrade: (upgrade: Upgrade) => void;
+    purchaseFoodUpgrade: (upgrade: Upgrade) => void;
     purchaseWoodUpgrade: (upgrade: Upgrade) => void;
     purchaseProducerUpgrade: (producer: Producer, upgrade: Upgrade) => void;
     start: () => void;
@@ -37,7 +37,7 @@ export class Game {
         this.chopWood = () => {
             this.resources().addList(this.chopIncome());
         };
-        this.growFood = () => {            
+        this.growFood = () => {
             this.resources().addList(this.farmIncome());
         };
         this.purchaseProducer = (producer: Producer) => {
@@ -46,16 +46,16 @@ export class Game {
                 producer.purchase();
             }
         };
-        this.purchaseFarmUpgrade = (upgrade: Upgrade) => {
+        this.purchaseFoodUpgrade = (upgrade: Upgrade) => {
             if (this.resources().canAfford(upgrade.cost())){
                 this.resources().minusCost(upgrade.cost());
-                upgrade.purchase(this.farmIncome());
+                this.farmIncome(upgrade.purchase(this.farmIncome()));
             }
         };
         this.purchaseWoodUpgrade = (upgrade: Upgrade) => {
             if (this.resources().canAfford(upgrade.cost())){
                 this.resources().minusCost(upgrade.cost());
-                upgrade.purchase(this.chopIncome());
+                this.chopIncome(upgrade.purchase(this.chopIncome()));
             }
         };
         this.purchaseProducerUpgrade = (producer: Producer, upgrade: Upgrade) => {

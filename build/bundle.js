@@ -56,16 +56,16 @@ class Game {
                 producer.purchase();
             }
         };
-        this.purchaseFarmUpgrade = (upgrade) => {
+        this.purchaseFoodUpgrade = (upgrade) => {
             if (this.resources().canAfford(upgrade.cost())) {
                 this.resources().minusCost(upgrade.cost());
-                upgrade.purchase(this.farmIncome());
+                this.farmIncome(upgrade.purchase(this.farmIncome()));
             }
         };
         this.purchaseWoodUpgrade = (upgrade) => {
             if (this.resources().canAfford(upgrade.cost())) {
                 this.resources().minusCost(upgrade.cost());
-                upgrade.purchase(this.chopIncome());
+                this.chopIncome(upgrade.purchase(this.chopIncome()));
             }
         };
         this.purchaseProducerUpgrade = (producer, upgrade) => {
@@ -92,18 +92,25 @@ exports.Game = Game;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const producer_1 = require("../purchasable/producer");
+const upgrade_1 = require("../purchasable/upgrade");
 const resources_1 = require("../resources/resources");
 class ProducerGenerator {
 }
+ProducerGenerator.tractorUpgrade = new upgrade_1.Upgrade('Tractor', '+3 to food', new resources_1.ResourceList().with(resources_1.Resources.Food, 8))
+    .with((resource) => {
+    const copy = resource.copy();
+    copy.add(resources_1.Resources.Food, 3);
+    return copy;
+});
 ProducerGenerator.generateProducers = () => {
     return [
-        new producer_1.Producer("Farmer", new resources_1.ResourceList().with(resources_1.Resources.Food, 1), new resources_1.ResourceList().with(resources_1.Resources.Food, 1)),
+        new producer_1.Producer("Farmer", new resources_1.ResourceList().with(resources_1.Resources.Food, 1), new resources_1.ResourceList().with(resources_1.Resources.Food, 1), new resources_1.ResourceList(), [ProducerGenerator.tractorUpgrade]),
         new producer_1.Producer("Lumberjack", new resources_1.ResourceList().with(resources_1.Resources.Wood, 1), new resources_1.ResourceList().with(resources_1.Resources.Food, 1))
     ];
 };
 exports.ProducerGenerator = ProducerGenerator;
 
-},{"../purchasable/producer":8,"../resources/resources":10}],5:[function(require,module,exports){
+},{"../purchasable/producer":8,"../purchasable/upgrade":9,"../resources/resources":10}],5:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const resources_1 = require("../resources/resources");
@@ -176,7 +183,7 @@ class Producer {
             this.quantity(this.quantity() + 1);
         };
         this.purchaseUpgrade = (upgrade) => {
-            upgrade.purchase(this.income());
+            this.income(upgrade.purchase(this.income()));
         };
         this.unlockIfSuitable = function (resources) {
             if (this.isUnlocked()) {
@@ -217,6 +224,7 @@ exports.Upgrade = Upgrade;
 },{"knockout":12}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const ko = require("knockout");
 var Resources;
 (function (Resources) {
     Resources[Resources["Food"] = 0] = "Food";
@@ -224,51 +232,67 @@ var Resources;
 })(Resources = exports.Resources || (exports.Resources = {}));
 class ResourceList {
     constructor() {
-        this.resources = [];
-        for (let resource in Resources) {
-            this.resources[resource] = 0;
-        }
+        this.resources = ko.observableArray([]);
+        Object.values(Resources).map((resource) => {
+            if (isNaN(Number(resource))) {
+                return;
+            }
+            this.resources().push(0);
+        });
         this.addList = (resources) => {
-            this.resources = resources.resources.map((num, idx) => {
-                return num + this.resources[idx];
-            });
+            this.resources(resources.resources().map((num, idx) => {
+                return num + this.resources()[idx];
+            }));
         };
         this.canAfford = (resources) => {
-            return this.resources.map((resource, index) => {
+            return this.resources().map((resource, index) => {
                 return resource >= resources.get(index);
             }).reduce((previous, current, i) => {
                 return previous && current;
             });
         };
         this.minusCost = (resources) => {
-            this.resources = resources.resources.map((num, idx) => {
-                return this.resources[idx] - num;
-            });
+            this.resources(resources.resources().map((num, idx) => {
+                return this.resources()[idx] - num;
+            }));
         };
         this.add = (resource, quantity) => {
-            this.resources[resource] += quantity;
+            this.resources()[resource] += quantity;
         };
         this.multiply = (multiplier) => {
-            this.resources = this.resources.map((num, idx) => {
+            this.resources(this.resources().map((num, idx) => {
                 return num * multiplier;
-            });
+            }));
         };
         this.multiplyAndRoundUp = (multiplier) => {
-            this.resources = this.resources.map((num, idx) => {
+            this.resources(this.resources().map((num, idx) => {
                 num = num > 0 ? num + 1 : num;
                 return Math.round(num * multiplier);
-            });
+            }));
         };
         this.get = (resource) => {
-            return this.resources[resource];
+            return this.resources()[resource];
         };
+        this.getAll = ko.computed(() => {
+            const array = [];
+            Object.values(Resources).map((resource) => {
+                if (isNaN(Number(resource))) {
+                    return;
+                }
+                array.push({ name: Resources[resource], value: this.resources()[resource] });
+            });
+            return array;
+        });
         this.with = (resource, quantity) => {
-            this.resources[resource] = quantity;
+            this.resources()[resource] = quantity;
             return this;
         };
         this.copy = () => {
             const copy = new ResourceList();
             Object.values(Resources).map((resource, index, arr) => {
+                if (isNaN(Number(resource))) {
+                    return;
+                }
                 copy.with(resource, this.get(resource));
             });
             return copy;
@@ -277,7 +301,7 @@ class ResourceList {
 }
 exports.ResourceList = ResourceList;
 
-},{}],11:[function(require,module,exports){
+},{"knockout":12}],11:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/

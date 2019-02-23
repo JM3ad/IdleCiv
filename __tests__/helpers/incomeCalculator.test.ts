@@ -9,6 +9,9 @@ describe('Income calculator should:',()=>{
         const income = calculator.calculateIncome([]);
         
         Object.values(Resources).forEach((resource)=>{
+            if(isNaN(Number(resource))){
+                return;
+            }
             expect(income.get(resource)).toBe(0);
         })
     })

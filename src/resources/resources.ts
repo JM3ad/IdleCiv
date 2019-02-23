@@ -6,7 +6,7 @@ export enum Resources{
 }
 
 export class ResourceList{
-    private resources: number[];
+    private resources: KnockoutObservableArray<number>;
 
     addList: (resources: ResourceList) => void;
     canAfford: (resources: ResourceList) => boolean;
@@ -16,23 +16,27 @@ export class ResourceList{
     multiplyAndRoundUp: (multiplier: number) => void;
     with: (resource: Resources, quantity: number) => ResourceList;
     get: (resource: Resources) => number;
+    getAll: KnockoutComputed<{name: string, value: number}[]>;
     copy: () => ResourceList;
 
     constructor(){
 
-        this.resources = [];
-        for (let resource in Resources) {
-            this.resources[resource] = 0;
-        }
+        this.resources = ko.observableArray([]);
+        Object.values(Resources).map((resource: Resources) => {
+            if(isNaN(Number(resource))){
+                return;
+            }
+            this.resources().push(0);
+        })
         
         this.addList = (resources: ResourceList) => {
-            this.resources = resources.resources.map((num, idx) => {
-                return num + this.resources[idx];
-              });
+            this.resources(resources.resources().map((num, idx) => {
+                return num + this.resources()[idx];
+              }));
         }
 
         this.canAfford = (resources: ResourceList) => {
-            return this.resources.map((resource: number, index: number) => {
+            return this.resources().map((resource: number, index: number) => {
                 return resource >= resources.get(index);
             }).reduce((previous: boolean, current: boolean, i: number) => {
                 return previous && current;
@@ -40,40 +44,54 @@ export class ResourceList{
         }
 
         this.minusCost = (resources: ResourceList) => {
-            this.resources = resources.resources.map((num, idx) => {
-                return this.resources[idx] - num;
-              });
+            this.resources(resources.resources().map((num, idx) => {
+                return this.resources()[idx] - num;
+              }));
         }
 
         this.add = (resource: Resources, quantity: number) => {
-            this.resources[resource] += quantity;
+            this.resources()[resource] += quantity;
         }
 
         this.multiply = (multiplier: number) => {
-            this.resources = this.resources.map((num, idx) => {
+            this.resources(this.resources().map((num, idx) => {
                 return num * multiplier;
-            });
+            }));
         }
 
         this.multiplyAndRoundUp = (multiplier: number) => {
-            this.resources = this.resources.map((num, idx) => {
+            this.resources(this.resources().map((num, idx) => {
                 num = num > 0 ? num + 1 : num;
                 return Math.round(num * multiplier);
-            });
+            }));
         }
 
         this.get = (resource: Resources) => {
-            return this.resources[resource];
+            return this.resources()[resource];
         }
 
+        this.getAll = ko.computed(() => {
+            const array : {name: string, value: number}[] = [];
+            Object.values(Resources).map((resource:Resources) => {
+                if(isNaN(Number(resource))){
+                    return;
+                }
+                array.push({name: Resources[resource], value: this.resources()[resource]});
+            })
+            return array;
+        })
+
         this.with = (resource: Resources, quantity: number) => {
-            this.resources[resource] = quantity;
+            this.resources()[resource] = quantity;
             return this;
         }
         
         this.copy = () => {
             const copy = new ResourceList();
             Object.values(Resources).map((resource, index: Number, arr) => {
+                if(isNaN(Number(resource))){
+                    return;
+                }
                 copy.with(resource, this.get(resource));
             })
             return copy;

@@ -31,7 +31,7 @@ export class Producer {
         }
 
         this.purchaseUpgrade = (upgrade: Upgrade) => {
-            upgrade.purchase(this.income());
+            this.income(upgrade.purchase(this.income()));
         }
 
         this.unlockIfSuitable = function(resources: ResourceList) {
