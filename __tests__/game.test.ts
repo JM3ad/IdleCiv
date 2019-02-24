@@ -1,6 +1,6 @@
 import {Producer} from 'purchasable/producer';
 import {Game} from 'game';
-import {Resources, ResourceList} from 'resources/resources';
+import {ResourceId, ResourceList} from 'resources/resources';
 
 function setUpGame(producers: Producer[]){
     const game = new Game();
@@ -11,27 +11,27 @@ function setUpGame(producers: Producer[]){
 describe('Resource collection should:', () => {
     test('see wood increase on chopping', () => {
         const game = setUpGame([]);
-        expect(game.resources().get(Resources.Wood)).toBe(0);
+        expect(game.resources().getResource(ResourceId.Wood).quantity()).toBe(0);
         game.chopWood(); 
-        expect(game.resources().get(Resources.Wood)).toBe(1);
+        expect(game.resources().getResource(ResourceId.Wood).quantity()).toBe(1);
     })
     test('see food increase on farming', () => {
         const game = setUpGame([]);
-        expect(game.resources().get(Resources.Food)).toBe(0);
+        expect(game.resources().getResource(ResourceId.Food).quantity()).toBe(0);
         game.growFood(); 
-        expect(game.resources().get(Resources.Food)).toBe(1);
+        expect(game.resources().getResource(ResourceId.Food).quantity()).toBe(1);
     })
     test('see wood stay unchanged on farming', () => {
         const game = setUpGame([]);
-        expect(game.resources().get(Resources.Wood)).toBe(0);
+        expect(game.resources().getResource(ResourceId.Wood).quantity()).toBe(0);
         game.growFood(); 
-        expect(game.resources().get(Resources.Wood)).toBe(0);
+        expect(game.resources().getResource(ResourceId.Wood).quantity()).toBe(0);
     })
     test('see food stay unchanged on chopping', () => {
         const game = setUpGame([]);
-        expect(game.resources().get(Resources.Food)).toBe(0);
+        expect(game.resources().getResource(ResourceId.Food).quantity()).toBe(0);
         game.chopWood(); 
-        expect(game.resources().get(Resources.Food)).toBe(0);
+        expect(game.resources().getResource(ResourceId.Food).quantity()).toBe(0);
     })
 })
 
@@ -42,7 +42,7 @@ describe('Purchasing producers should:', () => {
     const woodCost = 3;
 
     beforeEach(() => {
-        const cost = new ResourceList().with(Resources.Food, foodCost).with(Resources.Wood, woodCost)
+        const cost = new ResourceList().with(ResourceId.Food, foodCost).with(ResourceId.Wood, woodCost)
         producer = new Producer('name', new ResourceList(), cost);
         producer.purchase = jest.fn(() => {});
         game = setUpGame([producer]);
@@ -50,16 +50,16 @@ describe('Purchasing producers should:', () => {
 
     test('fail if too little food', () => {
         game.resources()
-            .with(Resources.Food, foodCost - 1)
-            .with(Resources.Wood, woodCost);
+            .with(ResourceId.Food, foodCost - 1)
+            .with(ResourceId.Wood, woodCost);
         game.purchaseProducer(producer);
         expect(producer.purchase).not.toHaveBeenCalled();
     })
 
     test('fail if too little wood', () => {
         game.resources()
-            .with(Resources.Food, foodCost + 4)
-            .with(Resources.Wood, woodCost - 2);
+            .with(ResourceId.Food, foodCost + 4)
+            .with(ResourceId.Wood, woodCost - 2);
         game.purchaseProducer(producer);
         expect(producer.purchase).not.toHaveBeenCalled();
     })
@@ -68,18 +68,18 @@ describe('Purchasing producers should:', () => {
         const startingFood = foodCost - 1;
         const startingWood = woodCost - 1;
         game.resources()
-            .with(Resources.Food, startingFood)
-            .with(Resources.Wood, startingWood);
+            .with(ResourceId.Food, startingFood)
+            .with(ResourceId.Wood, startingWood);
         game.purchaseProducer(producer);
         expect(producer.purchase).not.toHaveBeenCalled();
-        expect(game.resources().get(Resources.Food)).toBe(startingFood);
-        expect(game.resources().get(Resources.Wood)).toBe(startingWood);
+        expect(game.resources().getResource(ResourceId.Food).quantity()).toBe(startingFood);
+        expect(game.resources().getResource(ResourceId.Wood).quantity()).toBe(startingWood);
     })
 
     test('succeed if resources sufficient', () => {
         game.resources()
-            .with(Resources.Food, foodCost)
-            .with(Resources.Wood, woodCost);
+            .with(ResourceId.Food, foodCost)
+            .with(ResourceId.Wood, woodCost);
         game.purchaseProducer(producer);
         expect(producer.purchase).toHaveBeenCalled();
     })
@@ -88,11 +88,11 @@ describe('Purchasing producers should:', () => {
         const startingFood = foodCost + 1;
         const startingWood = woodCost + 3;
         game.resources()
-            .with(Resources.Food, startingFood)
-            .with(Resources.Wood, startingWood);
+            .with(ResourceId.Food, startingFood)
+            .with(ResourceId.Wood, startingWood);
         game.purchaseProducer(producer);
         expect(producer.purchase).toHaveBeenCalled();
-        expect(game.resources().get(Resources.Food)).toBe(startingFood - foodCost);
-        expect(game.resources().get(Resources.Wood)).toBe(startingWood - woodCost);
+        expect(game.resources().getResource(ResourceId.Food).quantity()).toBe(startingFood - foodCost);
+        expect(game.resources().getResource(ResourceId.Wood).quantity()).toBe(startingWood - woodCost);
     })
 })

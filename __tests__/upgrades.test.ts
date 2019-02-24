@@ -1,5 +1,5 @@
 import {Upgrade} from 'purchasable/upgrade';
-import {ResourceList, Resources} from 'resources/resources';
+import {ResourceList, ResourceId} from 'resources/resources';
 
 function setUpUpgrade(cost?: ResourceList){
     const name = "Name";
@@ -10,7 +10,7 @@ function setUpUpgrade(cost?: ResourceList){
 describe('Upgrades should:', ()=>{
     const doubleFoodEffect : (resources: ResourceList) => ResourceList = (resources: ResourceList) => {
         const copy = resources.copy()
-        copy.add(Resources.Food, resources.get(Resources.Food));
+        copy.add(ResourceId.Food, resources.getResource(ResourceId.Food).quantity());
         return copy;
     }
 
@@ -29,27 +29,27 @@ describe('Upgrades should:', ()=>{
         const initialWood = 6;
         const initialFood = 12;
         const initialResources = new ResourceList()
-            .with(Resources.Food, initialFood)
-            .with(Resources.Wood, initialWood);
+            .with(ResourceId.Food, initialFood)
+            .with(ResourceId.Wood, initialWood);
         const upgrade = setUpUpgrade().with(doubleFoodEffect);
         const updatedResources = upgrade.purchase(initialResources);
         expect(upgrade.purchased()).toBe(true);
-        expect(updatedResources.get(Resources.Food)).toBe(initialFood * 2);
-        expect(updatedResources.get(Resources.Wood)).toBe(initialWood);
+        expect(updatedResources.getResource(ResourceId.Food).quantity()).toBe(initialFood * 2);
+        expect(updatedResources.getResource(ResourceId.Wood).quantity()).toBe(initialWood);
     })
 
     test('not apply effect twice', ()=>{
         const initialWood = 6;
         const initialFood = 12;
         const initialResources = new ResourceList()
-            .with(Resources.Food, initialFood)
-            .with(Resources.Wood, initialWood);
+            .with(ResourceId.Food, initialFood)
+            .with(ResourceId.Wood, initialWood);
         const upgrade = setUpUpgrade().with(doubleFoodEffect);
         const firstPurchase = upgrade.purchase(initialResources);
         const secondPurchase = upgrade.purchase(firstPurchase);
         
         expect(upgrade.purchased()).toBe(true);
-        expect(secondPurchase.get(Resources.Food)).toBe(firstPurchase.get(Resources.Food));
-        expect(secondPurchase.get(Resources.Wood)).toBe(firstPurchase.get(Resources.Wood));
+        expect(secondPurchase.getResource(ResourceId.Food).quantity()).toBe(firstPurchase.getResource(ResourceId.Food).quantity());
+        expect(secondPurchase.getResource(ResourceId.Wood).quantity()).toBe(firstPurchase.getResource(ResourceId.Wood).quantity());
     })
 })

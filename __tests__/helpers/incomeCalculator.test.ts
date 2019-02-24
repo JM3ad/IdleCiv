@@ -1,18 +1,18 @@
 import {Producer} from 'purchasable/producer';
 import {IncomeCalculator} from 'helpers/incomeCalculator';
 import {ProducerGenerator} from 'generators/producerGenerator';
-import {ResourceList, Resources} from 'resources/resources';
+import {ResourceList, ResourceId} from 'resources/resources';
 
 describe('Income calculator should:',()=>{
     test('see no income for no producers', ()=>{
         const calculator = new IncomeCalculator();
         const income = calculator.calculateIncome([]);
         
-        Object.values(Resources).forEach((resource)=>{
+        Object.values(ResourceId).forEach((resource)=>{
             if(isNaN(Number(resource))){
                 return;
             }
-            expect(income.get(resource)).toBe(0);
+            expect(income.getResource(resource).quantity()).toBe(0);
         })
     })
 
@@ -20,8 +20,8 @@ describe('Income calculator should:',()=>{
         const calculator = new IncomeCalculator();
         const producers = ProducerGenerator.generateProducers();
 
-        expect(calculator.calculateIncome(producers).get(Resources.Food)).toBe(0);
-        expect(calculator.calculateIncome(producers).get(Resources.Wood)).toBe(0);
+        expect(calculator.calculateIncome(producers).getResource(ResourceId.Food).quantity()).toBe(0);
+        expect(calculator.calculateIncome(producers).getResource(ResourceId.Wood).quantity()).toBe(0);
     })
 
     test('see correct income for producers with non-0 quantity', () => {
@@ -29,9 +29,9 @@ describe('Income calculator should:',()=>{
         const foodIncome = 4;
         const woodIncome = 8;
         const foodResource = new ResourceList()
-            .with(Resources.Food, foodIncome);
+            .with(ResourceId.Food, foodIncome);
         const woodResource = new ResourceList()
-            .with(Resources.Wood, woodIncome);
+            .with(ResourceId.Wood, woodIncome);
         const producers = [
             new Producer('name', foodResource, new ResourceList()),
             new Producer('name2', woodResource, new ResourceList())
@@ -45,7 +45,7 @@ describe('Income calculator should:',()=>{
 
         const expectedFoodIncome = foodIncome * 3;
         const expectedWoodIncome = woodIncome * 6;
-        expect(calculator.calculateIncome(producers).get(Resources.Food)).toBe(expectedFoodIncome);
-        expect(calculator.calculateIncome(producers).get(Resources.Wood)).toBe(expectedWoodIncome);
+        expect(calculator.calculateIncome(producers).getResource(ResourceId.Food).quantity()).toBe(expectedFoodIncome);
+        expect(calculator.calculateIncome(producers).getResource(ResourceId.Wood).quantity()).toBe(expectedWoodIncome);
     })
 })

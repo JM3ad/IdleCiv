@@ -3,7 +3,7 @@ import * as ko from 'knockout';
 import {IncomeCalculator} from './helpers/incomeCalculator';
 import {ProducerGenerator} from './generators/producerGenerator';
 import { Painter } from './display/painter';
-import { ResourceList, Resources } from './resources/resources';
+import { ResourceList, ResourceId } from './resources/resources';
 import { Upgrade } from './purchasable/upgrade';
 import { UpgradeGenerator } from './generators/upgradeGenerator';
 
@@ -12,9 +12,9 @@ export class Game {
     painter: KnockoutObservable<Painter>;
     resources: KnockoutObservable<ResourceList>;
     chopIncome: KnockoutObservable<ResourceList> = ko.observable(new ResourceList()
-        .with(Resources.Wood, 1));;
+        .with(ResourceId.Wood, 1));;
     farmIncome: KnockoutObservable<ResourceList> = ko.observable(new ResourceList()
-        .with(Resources.Food, 1));;
+        .with(ResourceId.Food, 1));;
     chopUpgrades: KnockoutObservableArray<Upgrade> = ko.observableArray(UpgradeGenerator.generateChopUpgrades());
     farmUpgrades: KnockoutObservableArray<Upgrade> = ko.observableArray(UpgradeGenerator.generateFarmUpgrades());
     addIncome: () => void;
