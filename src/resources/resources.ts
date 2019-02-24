@@ -6,7 +6,7 @@ export class ResourceDisplay{
     quantity: KnockoutObservable<number> = ko.observable(0);
 
     value: KnockoutComputed<string> = ko.computed(() => {
-        return this.quantity ? this.quantity.toString() : "0";
+        return this.quantity ? this.quantity().toString() : "0";
     })
     display: KnockoutComputed<boolean> = ko.computed(() => {
         return this.quantity() > 0;

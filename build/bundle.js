@@ -246,7 +246,7 @@ class ResourceDisplay {
     constructor(id, name) {
         this.quantity = ko.observable(0);
         this.value = ko.computed(() => {
-            return this.quantity ? this.quantity.toString() : "0";
+            return this.quantity ? this.quantity().toString() : "0";
         });
         this.display = ko.computed(() => {
             return this.quantity() > 0;
@@ -278,8 +278,8 @@ const GenerateResources = () => {
 class ResourceList {
     constructor() {
         this.resources = ko.observableArray([]);
-        Object.values(GenerateResources).map((resource) => {
-            this.resources().push(resource);
+        Object.values(GenerateResources()).map((resource) => {
+            this.resources()[resource.id] = resource;
         });
         this.addList = (resources) => {
             resources.resources().map((resource, idx) => {
@@ -311,10 +311,10 @@ class ResourceList {
             this.resources().map((resource) => {
                 const currentQuantity = this.resources()[resource.id].quantity();
                 const quantityToMultiply = currentQuantity > 0 ? currentQuantity + 1 : currentQuantity;
-                this.resources()[resource.id].quantity(quantityToMultiply * multiplier);
+                this.resources()[resource.id].quantity(Math.round(quantityToMultiply * multiplier));
             });
         };
-        this.getResourceDisplay = (resource) => {
+        this.getResource = (resource) => {
             return this.resources()[resource];
         };
         this.getResourceQuantity = (resource) => {
