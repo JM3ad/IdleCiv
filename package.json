@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "start": "node server.js",
-    "build": "tsc && browserify .\\build\\main.js -o .\\build\\bundle.js"
+    "build": "tsc && browserify ./build/main.js -o ./build/bundle.js"
   },
   "author": "Jack Mead",
   "license": "ISC",
