@@ -17,7 +17,7 @@
     "browserify": "^16.2.3",
     "fabric": "^2.6.0",
     "jest": "^24.1.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "knockout": "^3.4.2",
     "requirejs": "^2.3.6",
     "ts-jest": "^23.10.5",
