@@ -27,6 +27,6 @@
     "@types/fabric": "^1.5.53",
     "@types/knockout": "^3.4.63",
     "fabricjs": "^1.0.0",
-    "npm": "^6.8.0"
+    "npm": "^6.14.6"
   }
 }
